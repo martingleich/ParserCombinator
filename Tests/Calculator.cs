@@ -1,11 +1,16 @@
+<<<<<<<< HEAD:Tests/Calculator.cs
 ﻿using ParserCombinator;
 
 namespace Tests;
 
 using static Parser;
+========
+﻿namespace ParserCombinator;
+>>>>>>>> origin/master:ParserCombinator/Program.cs
 
 public class Calculator
 {
+<<<<<<<< HEAD:Tests/Calculator.cs
     private static int ParseInt(IEnumerable<char> digits) => digits.Aggregate(0, (accum, d) => accum * 10 + (d - '0'));
     private static Parser<Func<int, int, int>> Op(char op, Func<int, int, int> f) => Char(op).Return(f);
 
@@ -46,4 +51,9 @@ public class Calculator
     [InlineData("2*")]
     [InlineData("-")]
     public void Fail(string text) => Assert.False(Expression(text).IsOkay);
+========
+    public static void Main()
+    {
+    }
+>>>>>>>> origin/master:ParserCombinator/Program.cs
 }
