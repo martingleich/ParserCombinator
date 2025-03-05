@@ -1,4 +1,4 @@
 /.idea/
-/ParserCombinator/bin/
-/ParserCombinator/obj/
+/**/bin/
+/**/obj/
 *.user
