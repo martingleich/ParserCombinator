@@ -170,6 +170,22 @@ public static class Parser
             (first, tail)
                 => tail.Aggregate(first, (acc, op_arg) => op_arg.Item1(acc, op_arg.Item2)));
     }
+    public static Parser<T> ChainRight<T>(Parser<T> parserArg, Parser<Func<T, T, T>> parserOp)
+    {
+        var parserTail = Any(Sequence(parserOp, parserArg,
+            (op, arg)
+                => (op, arg))).Select(x => x.ToArray());
+        return Sequence(parserArg, parserTail, RFold);
+
+        static T RFold(T first, (Func<T, T, T>, T)[] args)
+        {
+            if (args.Length == 0)
+                return first;
+            for (int i = args.Length - 1; i > 0; --i)
+                args[i - 1].Item2 = args[i].Item1(args[i - 1].Item2, args[i].Item2);
+            return args[0].Item1(first, args[0].Item2);
+        }
+    }
 
     public static Parser<TR> Sequence<T1, T2, TR>(Parser<T1> parser1, Parser<T2> parser2,
         Func<T1, T2, TR> resultSelector) => from p1 in parser1
