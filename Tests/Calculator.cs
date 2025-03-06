@@ -38,6 +38,7 @@ public class Calculator
     [InlineData("-2", -2)]
     [InlineData("1+2* -3", -5)]
     [InlineData("2*( 1 - 2)", -2)]
+    [InlineData("(1 + 2) * 5", 15)]
     [InlineData("- -1", 1)]
     [InlineData("2^3", 8)]
     [InlineData("4^3^2", (4*4*4*4*4)*(4*4*4*4))]
