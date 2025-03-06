@@ -7,8 +7,8 @@ using static Parser;
 public class Calculator
 {
     private static int ParseInt(IEnumerable<char> digits) => digits.Aggregate(0, (accum, d) => accum * 10 + (d - '0'));
-    private static Parser<Func<int, int, int>> Op(char op, Func<int, int, int> f) => Char(op).Return(f);
-    private static Parser<Func<int, int>> UnaryOp(char op, Func<int, int> f) => Char(op).Return(f);
+    private static Parser<Func<int, int, int>> Op(char op, Func<int, int, int> f) => Char(op).Return(f).Skip(Whitespaces);
+    private static Parser<Func<int, int>> UnaryOp(char op, Func<int, int> f) => Char(op).Return(f).Skip(Whitespaces);
 
     private static readonly Parser<int> Expression = Create(() =>
     {
@@ -20,17 +20,19 @@ public class Calculator
             Op('*', (a, b) => a * b),
             Op('/', (a, b) => a / b));
         var opPow = Op('^', (a, b) => (int)Math.Pow(a, b));
-        var opNegate = UnaryOp('-', v => -v);
+        var opPrefix = OneOf(
+            UnaryOp('-', v => -v),
+            UnaryOp('+', v => v));
 
         return Recursive<int>(expr =>
         {
             var bracketedExpr = Surround(Char('(').Skip(Whitespaces), expr, Char(')'));
             var term = OneOf(number, bracketedExpr);
-            var prefix = opNegate.Skip(Whitespaces).Any().Select(Functional.Flatten);
+            var prefix = opPrefix.Any().Select(Functional.Flatten);
             var negation = Sequence(prefix, term, (p, t) => p(t)).Skip(Whitespaces);
-            var power = ChainRight(negation, opPow.Skip(Whitespaces));
-            var product = ChainLeft(power, opProduct.Skip(Whitespaces));
-            return ChainLeft(product, opSum.Skip(Whitespaces));
+            var power = ChainRight(negation, opPow);
+            var product = ChainLeft(power, opProduct);
+            return ChainLeft(product, opSum);
         });
     });
 
